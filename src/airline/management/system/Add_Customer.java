@@ -1,167 +1,140 @@
 package airline.management.system;
 
-import java.awt.EventQueue;
-
-
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.*;
 import javax.swing.*;
+import java.sql.*;
 
-public class Add_Customer extends JFrame{ //Third Frame
+public class Add_Customer extends JFrame {
 
-    
-	JTextField textField,textField_1,textField_2,textField_3,textField_4,textField_5,textField_6;
+    // Declare UI components as private instance variables
+    private JTextField passportField, pnrField, addressField, nationalityField, nameField, flightCodeField, phoneField;
+    private JRadioButton maleRadioButton, femaleRadioButton;
+    private JButton saveButton;
 
-        public Add_Customer(){
-            getContentPane().setForeground(Color.BLUE);
-            getContentPane().setBackground(Color.WHITE);
-            setTitle("ADD CUSTOMER DETAILS");
-		 
-            setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-            setSize(778,486);
-            getContentPane().setLayout(null);
-			
-            JLabel Passportno = new JLabel("PASSPORT NO");
-            Passportno.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Passportno.setBounds(60, 80, 150, 27);
-            add(Passportno);
-            
-            textField = new JTextField();
-            textField.setBounds(200, 80, 150, 27);
-            add(textField);
-			
-            JButton Next = new JButton("SAVE");
-            Next.setBounds(200, 420, 150, 30);
-            Next.setBackground(Color.BLACK);
-            Next.setForeground(Color.WHITE);
-            add(Next);
-			
-            JLabel Pnrno = new JLabel("PNR NO");
-            Pnrno.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Pnrno.setBounds(60, 120, 150, 27);
-            add(Pnrno);
-			
-            textField_1 = new JTextField();
-            textField_1.setBounds(200, 120, 150, 27);
-            add(textField_1);
-            
-            JLabel Address = new JLabel("ADDRESS");
-            Address.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Address.setBounds(60, 170, 150, 27);
-            add(Address);
-			
-            textField_2 = new JTextField();
-            textField_2.setBounds(200, 170, 150, 27);
-            add(textField_2);
-            		
-            JLabel Nationality = new JLabel("NATIONALITY");
-            Nationality.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Nationality.setBounds(60, 220, 150, 27);
-            add(Nationality);
-			
-            textField_3 = new JTextField();
-            textField_3.setBounds(200, 220, 150, 27);
-            add(textField_3);
-	
-            JLabel Name = new JLabel("NAME");
-            Name.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Name.setBounds(60, 270, 150, 27);
-            add(Name);
-	
-            textField_4 = new JTextField();
-            textField_4.setBounds(200, 270, 150, 27);
-            add(textField_4);
-	
-            JLabel Gender = new JLabel("GENDER");
-            Gender.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Gender.setBounds(60, 320, 150, 27);
-            add(Gender);
-		
-            JRadioButton NewRadioButton = new JRadioButton("MALE");
-            NewRadioButton.setBackground(Color.WHITE);
-            NewRadioButton.setBounds(200, 320, 70, 27);
-            add(NewRadioButton);
-	
-            JRadioButton Female = new JRadioButton("FEMALE");
-            Female.setBackground(Color.WHITE);
-            Female.setBounds(280, 320, 70, 27);
-            add(Female);
-            
-            JLabel Phno = new JLabel("PH NO");
-            Phno.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Phno.setBounds(60, 370, 150, 27);
-            add(Phno);
-			
-            textField_5 = new JTextField();
-            textField_5.setBounds(200, 370, 150, 27);
-            add(textField_5);
-	
-            setVisible(true);
-	
-            JLabel AddPassengers = new JLabel("ADD CUSTOMER DETAILS");
-            AddPassengers.setForeground(Color.BLUE);
-            AddPassengers.setFont(new Font("Tahoma", Font.PLAIN, 31));
-            AddPassengers.setBounds(420, 24, 442, 35);
-            add(AddPassengers);
-			
-    
-            JLabel Flightcode = new JLabel("FLIGHT CODE");
-            Flightcode.setFont(new Font("Tahoma", Font.PLAIN, 17));
-            Flightcode.setBounds(60, 30, 150, 27);
-            add(Flightcode);
+    // Singleton instance of database connection
+    private static Conn databaseConnection;
 
-            textField_6 = new JTextField();
-            textField_6.setBounds(200, 30, 150, 27);
-            add(textField_6);
-            
-            
-            ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("airline/management/system/icon/emp.png"));
-            JLabel image = new JLabel(i1);
-            image.setBounds(450,80,280,410);
-            add(image);
+    public Add_Customer() {
+        // Initialize the singleton instance of the database connection
+        if (databaseConnection == null) {
+            databaseConnection = Conn.getInstance();
+        }
 
-            
-            Next.addActionListener(new ActionListener(){
-                public void actionPerformed(ActionEvent ae){
-                    String passport_No = textField.getText();
-                    String pnr_no = textField_1.getText();
-                    String address =  textField_2.getText();
-                    String nationality = textField_3.getText();
-                    String name = textField_4.getText();
-                    String fl_code = textField_6.getText();
-                   
-                    String gender = null;
-                    String ph_no = textField_5.getText();
-                    
-                    if(NewRadioButton.isSelected()){
-                        gender = "male";
-                    
-                    }else if(Female.isSelected()){
-                        gender = "female";
-                    }
-                    
-                    try {
-                        conn c = new conn();
-                        String str = "INSERT INTO passenger values( '"+pnr_no+"', '"+address+"', '"+nationality+"','"+name+"', '"+gender+"', '"+ph_no+"','"+passport_No+"', '"+fl_code+"')";
-                        
-                        c.s.executeUpdate(str);
-                        JOptionPane.showMessageDialog(null,"Customer Added");
-                        setVisible(false);
-                    
-                    } catch (Exception e) {
-                        e.printStackTrace();
-        	    }
-		}
-            });
-			
-            setSize(900,600);
-            setVisible(true);
-            setLocation(400,200);
-			
-	}
+        // Set up the JFrame properties
+        setTitle("Add Customer Details");
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setSize(800, 500);
+        getContentPane().setBackground(Color.WHITE);
+        setLayout(null);
+        setLocationRelativeTo(null);
         
-    public static void main(String[] args){
-        new Add_Customer();
-    }   
+        // Create UI components
+        createUIComponents();
+        
+        // Add action listeners
+        addActionListeners();
+
+        // Set the JFrame to be visible
+        setVisible(true);
+    }
+
+    private void createUIComponents() {
+        // Add title label
+        JLabel titleLabel = new JLabel("Add Customer Details");
+        titleLabel.setForeground(Color.BLUE);
+        titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 31));
+        titleLabel.setBounds(420, 24, 442, 35);
+        add(titleLabel);
+
+        // Add labels and text fields using a helper method
+        addLabeledTextField("Passport No", 80, passportField);
+        addLabeledTextField("PNR No", 120, pnrField);
+        addLabeledTextField("Address", 170, addressField);
+        addLabeledTextField("Nationality", 220, nationalityField);
+        addLabeledTextField("Name", 270, nameField);
+        addLabeledTextField("Flight Code", 30, flightCodeField);
+        addLabeledTextField("Phone No", 370, phoneField);
+
+        // Add gender radio buttons
+        JLabel genderLabel = new JLabel("Gender");
+        genderLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
+        genderLabel.setBounds(60, 320, 150, 27);
+        add(genderLabel);
+        
+        maleRadioButton = new JRadioButton("Male");
+        maleRadioButton.setBounds(200, 320, 70, 27);
+        add(maleRadioButton);
+        
+        femaleRadioButton = new JRadioButton("Female");
+        femaleRadioButton.setBounds(280, 320, 70, 27);
+        add(femaleRadioButton);
+        
+        // Group the radio buttons
+        ButtonGroup genderGroup = new ButtonGroup();
+        genderGroup.add(maleRadioButton);
+        genderGroup.add(femaleRadioButton);
+
+        // Add Save button
+        saveButton = new JButton("Save");
+        saveButton.setBounds(200, 420, 150, 30);
+        saveButton.setBackground(Color.BLACK);
+        saveButton.setForeground(Color.WHITE);
+        add(saveButton);
+    }
+    
+    private void addLabeledTextField(String labelText, int yPosition, JTextField textField) {
+        // Create and add label
+        JLabel label = new JLabel(labelText);
+        label.setFont(new Font("Tahoma", Font.PLAIN, 17));
+        label.setBounds(60, yPosition, 150, 27);
+        add(label);
+        
+        // Create and add text field
+        textField = new JTextField();
+        textField.setBounds(200, yPosition, 150, 27);
+        add(textField);
+    }
+    
+    private void addActionListeners() {
+        // Add action listener to Save button
+        saveButton.addActionListener(event -> saveCustomer());
+    }
+
+    private void saveCustomer() {
+        // Retrieve values from text fields
+        String passportNo = passportField.getText();
+        String pnrNo = pnrField.getText();
+        String address = addressField.getText();
+        String nationality = nationalityField.getText();
+        String name = nameField.getText();
+        String flightCode = flightCodeField.getText();
+        String phoneNo = phoneField.getText();
+        
+        // Determine gender
+        String gender = maleRadioButton.isSelected() ? "Male" : "Female";
+
+        // Prepare and execute the SQL insert statement
+        try {
+            Statement statement = databaseConnection.getConnection().createStatement();
+            String query = String.format(
+                "INSERT INTO passenger (pnr_no, address, nationality, name, gender, ph_no, passport_no, flight_code) " +
+                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+                pnrNo, address, nationality, name, gender, phoneNo, passportNo, flightCode
+            );
+            
+            statement.executeUpdate(query);
+            
+            // Display success message
+            JOptionPane.showMessageDialog(this, "Customer Added Successfully");
+            setVisible(false);
+        } catch (SQLException e) {
+            // Handle SQL exceptions
+            JOptionPane.showMessageDialog(this, "Failed to add customer: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> new Add_Customer());
+    }
 }

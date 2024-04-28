@@ -3,118 +3,100 @@ package airline.management.system;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-
-public class Cancel extends JFrame { //Sixth
-    
-    private JTextField textField,textField_1,textField_2,textField_3,textField_4;
+public class Cancel extends JFrame {
+    private JTextField passengerNoField, cancellationNoField, cancellationDateField, ticketIdField, flightCodeField;
+    private JButton cancelButton;
 
     public static void main(String[] args) {
-        new Cancel();
+        EventQueue.invokeLater(() -> new Cancel());
     }
-    
+
     public Cancel() {
         initialize();
     }
-    
+
     private void initialize() {
-        setTitle("CANCELLATION");
-	getContentPane().setBackground(Color.WHITE);
-	setBounds(100, 100, 801, 472);
-	setLayout(null);
-		
-	JLabel Cancellation = new JLabel("CANCELLATION");
-	Cancellation.setFont(new Font("Tahoma", Font.PLAIN, 31));
-	Cancellation.setBounds(185, 24, 259, 38);
-	add(Cancellation);
-		
-	
-        ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("airline/management/system/icon/cancel.png"));
-        Image i2 = i1.getImage().getScaledInstance(250, 250, Image.SCALE_DEFAULT);
-        ImageIcon i3 = new ImageIcon(i2);
-        JLabel NewLabel = new JLabel(i3);
-	NewLabel.setBounds(470, 100, 250, 250);
-	add(NewLabel);
-		
-	JLabel PassengerNo = new JLabel("PASSENGER NO");
-	PassengerNo.setFont(new Font("Tahoma", Font.PLAIN, 17));
-	PassengerNo.setBounds(60, 100, 132, 26);
-	add(PassengerNo);
-		
-	JLabel CancellationNo = new JLabel("CANCELLATION NO");
-	CancellationNo.setFont(new Font("Tahoma", Font.PLAIN, 17));
-	CancellationNo.setBounds(60, 150, 150, 27);
-	add(CancellationNo);
-		
-	JLabel CancellationDate = new JLabel("CANCELLATION DATE");
-	CancellationDate.setFont(new Font("Tahoma", Font.PLAIN, 17));
-	CancellationDate.setBounds(60, 200, 180, 27);
-	add(CancellationDate);
-		
-	JLabel Ticketid = new JLabel("TICKET_ID");
-	Ticketid.setFont(new Font("Tahoma", Font.PLAIN, 17));
-	Ticketid.setBounds(60, 250, 150, 27);
-	add(Ticketid);
-		
-	JLabel Flightcode = new JLabel("FLIGHT_CODE");
-	Flightcode.setFont(new Font("Tahoma", Font.PLAIN, 17));
-	Flightcode.setBounds(60, 300, 150, 27);
-	add(Flightcode);
-		
-	JButton Cancel = new JButton("CANCEL");
-	Cancel.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        Cancel.setBackground(Color.BLACK);
-        Cancel.setForeground(Color.WHITE);
-	Cancel.setBounds(250, 350, 150, 30);
-	add(Cancel);
-		
-	textField = new JTextField();
-	textField.setBounds(250, 100, 150, 27);
-	add(textField);
-	
-        textField_1 = new JTextField();
-	textField_1.setBounds(250, 150, 150, 27);
-	add(textField_1);
-		
-	textField_2 = new JTextField();
-	textField_2.setBounds(250, 200, 150, 27);
-	add(textField_2);
-	
-        textField_3 = new JTextField();
-	textField_3.setBounds(250, 250, 150, 27);
-	add(textField_3);
-		
-	textField_4 = new JTextField();
-	textField_4.setBounds(250, 300, 150, 27);
-	add(textField_4);
-	
-        Cancel.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae){
-		
-                String passenger_no = textField.getText();
-		String cancellation_no = textField_1.getText();
-		String cancellation_date = textField_2.getText();
-		String ticket_id = textField_3.getText();
-		String flight_code = textField_4.getText();
-					
-					
-		try{	
-                    conn c = new conn();
-                    String str = "INSERT INTO cancellation values('"+passenger_no+"', '"+cancellation_no+"', '"+cancellation_date+"', '"+ticket_id+"', '"+flight_code+"')";
-		
-                    c.s.executeUpdate(str);
-                    JOptionPane.showMessageDialog(null,"Ticket Canceled");
-                    setVisible(false);
-						
-		}catch (Exception e) {
-                    e.printStackTrace();
-                }
+        setTitle("Cancellation");
+        getContentPane().setBackground(Color.WHITE);
+        setBounds(100, 100, 801, 472);
+        setLayout(null);
+
+        JLabel cancellationLabel = new JLabel("CANCELLATION");
+        cancellationLabel.setFont(new Font("Tahoma", Font.PLAIN, 31));
+        cancellationLabel.setBounds(185, 24, 259, 38);
+        add(cancellationLabel);
+
+        ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("airline/management/system/icon/cancel.png"));
+        Image image = icon.getImage().getScaledInstance(250, 250, Image.SCALE_DEFAULT);
+        ImageIcon scaledIcon = new ImageIcon(image);
+        JLabel iconLabel = new JLabel(scaledIcon);
+        iconLabel.setBounds(470, 100, 250, 250);
+        add(iconLabel);
+
+        addLabeledTextField("PASSENGER NO", 100, passengerNoField);
+        addLabeledTextField("CANCELLATION NO", 150, cancellationNoField);
+        addLabeledTextField("CANCELLATION DATE", 200, cancellationDateField);
+        addLabeledTextField("TICKET_ID", 250, ticketIdField);
+        addLabeledTextField("FLIGHT_CODE", 300, flightCodeField);
+
+        cancelButton = new JButton("Cancel");
+        cancelButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        cancelButton.setBackground(Color.BLACK);
+        cancelButton.setForeground(Color.WHITE);
+        cancelButton.setBounds(250, 350, 150, 30);
+        add(cancelButton);
+
+        cancelButton.addActionListener(this::cancelTicket);
+
+        setSize(860, 500);
+        setVisible(true);
+        setLocation(400, 200);
+    }
+
+    private void addLabeledTextField(String label, int yPosition, JTextField textField) {
+        JLabel textLabel = new JLabel(label);
+        textLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
+        textLabel.setBounds(60, yPosition, 150, 27);
+        add(textLabel);
+
+        textField = new JTextField();
+        textField.setBounds(250, yPosition, 150, 27);
+        add(textField);
+    }
+
+    private void cancelTicket(ActionEvent event) {
+        // Retrieve input values
+        String passengerNo = passengerNoField.getText();
+        String cancellationNo = cancellationNoField.getText();
+        String cancellationDate = cancellationDateField.getText();
+        String ticketId = ticketIdField.getText();
+        String flightCode = flightCodeField.getText();
+
+        // Get the singleton instance of the Conn class
+        Conn connInstance = Conn.getInstance();
+        Connection connection = connInstance.getConnection();
+
+        try {
+            // Prepare and execute SQL statement
+            String query = "INSERT INTO cancellation (passenger_no, cancellation_no, cancellation_date, ticket_id, flight_code) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, passengerNo);
+                preparedStatement.setString(2, cancellationNo);
+                preparedStatement.setString(3, cancellationDate);
+                preparedStatement.setString(4, ticketId);
+                preparedStatement.setString(5, flightCode);
+
+                preparedStatement.executeUpdate();
+                JOptionPane.showMessageDialog(this, "Ticket Canceled");
+                setVisible(false);
             }
-        });
-			
-	setSize(860,500);
-	setVisible(true);
-        setLocation(400,200);
+        } catch (SQLException e) {
+            // Handle SQL exception
+            JOptionPane.showMessageDialog(this, "Failed to cancel ticket: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
